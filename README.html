@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Intro to Promise Theory and CFEngine</title>
+<meta name="author" content="(Nick Anderson)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="reveal.js-3.6.0/css/reveal.css"/>
+
+<link rel="stylesheet" href="reveal.js-3.6.0/css/theme/white.css" id="theme"/>
+
+<link rel="stylesheet" href="reveal.js-3.6.0/lib/css/zenburn.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'reveal.js-3.6.0/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+<meta name="description" content="Presentation slides">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section id="sec-title-slide"><h2>Intro to Promise Theory and CFEngine</h2><h3></h3><h4>Building Stable Relationships - CS444 Linux Essentials</h4>
+</section>
+
+<section>
+<section id="slide-org7a26fc3" data-background="./data/a8/09bf77-4db5-4889-8680-9917f6ef9978/ddfbddb2f20d9f8d1ffb469db33708f566e6824av2_00_2018-03-13_08-51-15.jpg">
+<h2 id="org7a26fc3"><a id="ID-a809bf77-4db5-4889-8680-9917f6ef9978"></a><font color="white">Who am I?</font></h2>
+<ul>
+<li class="fragment appear"><font color="white">Nick Anderson</font></li>
+<li class="fragment appear"><font color="white">Husband/Dad</font></li>
+<li class="fragment appear"><font color="white">Sysadmin/Infrastructure Engineer</font></li>
+<li class="fragment appear"><font color="white">CFEngine Doer of Things|Factotum @ Northern.tech</font></li>
+
+</ul>
+
+<aside class="notes">
+<ul>
+<li>Wife, 2 kids and a dog</li>
+<li>Infrastructure management for &gt; 15 years</li>
+<li>CFEngine since 2010 (8 years), with company since 2013 (5 years)
+<ul>
+<li>Focus on Automation, Security, Compliance
+<ul>
+<li>Devices, Workstations, Servers, IoT</li>
+
+</ul></li>
+
+</ul></li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-orge43f703" data-background="./2018-01-14_Selection_005.png" data-background-size="99%">
+<h2 id="orge43f703"></h2>
+
+</section>
+</section>
+<section>
+<section id="slide-orgf32b38c">
+<h2 id="orgf32b38c">Relationships</h2>
+<blockquote nil>
+<p>
+It's all about who you know.
+&#x2013; They
+</p>
+</blockquote>
+
+<aside class="notes">
+<p>
+Before we start:
+</p>
+<ul>
+<li>What's the point of all this?
+<ul>
+<li>How can we engineer stable, resilient systems</li>
+
+</ul></li>
+<li>Systems are comprised of discreet parts</li>
+<li>We need to understand the relationships that bind the parts together</li>
+
+</ul>
+
+</aside>
+
+<ul>
+<li class="fragment appear">How many things can you know?</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org3703296" data-background="./data/80/023a40-fc3c-4dd3-9702-8f44e27ab4c7/1490913157807_2018-02-17_11-50-16.jpg" data-background-size="99%">
+<h3 id="org3703296"><a id="ID-80023a40-fc3c-4dd3-9702-8f44e27ab4c7"></a><font color="white">Dunbar</font></h3>
+<aside class="notes">
+<p>
+Dunbar studied primates.
+</p>
+
+<p>
+Dunbar explained it informally as *"the number of people you would not feel
+embarrassed about joining uninvited for a drink if you happened to bump into
+them in a bar"*.
+</p>
+
+<p>
+Dunbar, Robin (1998). Grooming, gossip, and the evolution of language (1st
+Harvard University Press paperback ed.). Cambridge, Mass.: Harvard University
+Press. p. 77. ISBN 0674363361. Retrieved 17 December 2016.
+</p>
+
+<p>
+On the periphery, the number *also includes past colleagues, such as high
+school friends, with whom a person would want to reacquaint himself or herself
+if they met again.*
+</p>
+
+<p>
+Carl Bialik (16 November 2007). "Sorry, You May Have Gone Over Your Limit Of
+Network Friends". The Wall Street Journal Online. Retrieved 2007-12-02.
+</p>
+
+<ul>
+<li><a href="http://www.lifewithalacrity.com/2004/03/the_dunbar_numb.html">http://www.lifewithalacrity.com/2004/03/the_dunbar_numb.html</a></li>
+<li><a href="http://www.ontheagilepath.net/2015/12/magical-team-size-numbers-2-3-5-7-12-50-150-1500-and-how-to-avoid-wasting-everybodys-time.html">http://www.ontheagilepath.net/2015/12/magical-team-size-numbers-2-3-5-7-12-50-150-1500-and-how-to-avoid-wasting-everybodys-time.html</a></li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-orgbadcc75" data-background="./data/07/18a6ce-f8dc-42c2-90d5-a7a7a94e48bf/1490913157807_2018-02-17_11-50-16-blurred_2018-03-13_08-47-48.jpg">
+<h3 id="orgbadcc75"><a id="ID-0718a6ce-f8dc-42c2-90d5-a7a7a94e48bf"></a><font color="white">Dunbar</font></h3>
+<ul>
+<li class="fragment appear"><font color="white">Maximum number of stable relationships one can manage</font></li>
+<li class="fragment appear"><font color="white">~ 150</font></li>
+
+</ul>
+<ul>
+<li class="fragment appear"><font color="white">2–3 intimate relationships</font></li>
+<li class="fragment appear"><font color="white">5-7 circle of our very closest friends</font></li>
+<li class="fragment appear"><font color="white">12–50 tribe</font></li>
+<li class="fragment appear"><font color="white">150–1500 battalion</font></li>
+
+</ul>
+
+<aside class="notes">
+<p>
+Dunbar studied primates.
+</p>
+
+<p>
+Dunbar explained it informally as *"the number of people you would not feel
+embarrassed about joining uninvited for a drink if you happened to bump into
+them in a bar"*.
+</p>
+
+<p>
+Dunbar, Robin (1998). Grooming, gossip, and the evolution of language (1st
+Harvard University Press paperback ed.). Cambridge, Mass.: Harvard University
+Press. p. 77. ISBN 0674363361. Retrieved 17 December 2016.
+</p>
+
+<p>
+On the periphery, the number *also includes past colleagues, such as high
+school friends, with whom a person would want to reacquaint himself or herself
+if they met again.*
+</p>
+
+<p>
+Carl Bialik (16 November 2007). "Sorry, You May Have Gone Over Your Limit Of
+Network Friends". The Wall Street Journal Online. Retrieved 2007-12-02.
+</p>
+
+<ul>
+<li><a href="http://www.lifewithalacrity.com/2004/03/the_dunbar_numb.html">http://www.lifewithalacrity.com/2004/03/the_dunbar_numb.html</a></li>
+<li><a href="http://www.ontheagilepath.net/2015/12/magical-team-size-numbers-2-3-5-7-12-50-150-1500-and-how-to-avoid-wasting-everybodys-time.html">http://www.ontheagilepath.net/2015/12/magical-team-size-numbers-2-3-5-7-12-50-150-1500-and-how-to-avoid-wasting-everybodys-time.html</a></li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-org667b6f9">
+<h3 id="org667b6f9"><a id="ID-1b6a7a59-e573-4df0-bf94-9fe4fc8248bc"></a>Trust</h3>
+<ul>
+<li class="fragment appear">The foundation of relationships</li>
+<li class="fragment appear">Necessary for large systems like societies to function</li>
+<li class="fragment appear">Built on repeated interactions over time</li>
+
+</ul>
+
+<div class="figure">
+<p><img src="data/1b/6a7a59-e573-4df0-bf94-9fe4fc8248bc/2018-03-13_Selection_001_2018-03-13_09-56-22.png" alt="2018-03-13_Selection_001_2018-03-13_09-56-22.png" class="fragment (appear)" />
+</p>
+</div>
+
+<aside class="notes">
+<ul>
+<li>Economical</li>
+<li>Allows us to do less work</li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-orgf4d26cb" data-background="./data/f8/dc7d74-c4ba-4d67-b803-9e75dcdf2986/Smart-City-von-oben-klein_2018-03-13_08-04-36.jpeg">
+<h3 id="orgf4d26cb"></h3>
+
+</section>
+</section>
+<section>
+<section id="slide-org4551f4a" data-background="./data/f8/dc7d74-c4ba-4d67-b803-9e75dcdf2986/Smart-City-von-oben-klein_2018-03-13_08-04-36-blurred.jpeg">
+<h3 id="org4551f4a"><a id="ID-f8dc7d74-c4ba-4d67-b803-9e75dcdf2986"></a><font color="white">Scaling</font></h3>
+<ul>
+<li class="fragment appear"><font color="white">Can technology scale your relationships?</font> <font color="white">https://www.youtube.com/watch?v=07IpED729k8</font></li>
+
+</ul>
+<ul>
+<li class="fragment appear"><font color="white">TLDW; Kind of but no not really</font></li>
+
+</ul>
+
+<aside class="notes">
+<ul>
+<li>Common for groups to break up along Dunbar limits
+<ul>
+<li>Nuclear Family Sizes</li>
+<li>Classrooms</li>
+
+</ul></li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-orgbf96ceb">
+<h2 id="orgbf96ceb"><a id="ID-65cf670e-a934-464d-a058-ee9d65f8ad69"></a>Imposition</h2>
+
+<div class="figure">
+<p><img src="data/65/cf670e-a934-464d-a058-ee9d65f8ad69/Chain-Gang-2_2018-03-13_07-56-05.jpg" alt="Chain-Gang-2_2018-03-13_07-56-05.jpg" />
+</p>
+</div>
+
+<aside class="notes">
+<ul>
+<li>Golden Images</li>
+<li>The controller must act for everyone</li>
+<li>SSH/Commands</li>
+<li>What if multiple bosses give conflicting orders</li>
+<li>Difficult to identify proper authority</li>
+
+</ul>
+
+<p>
+Impose on someone: Throw something that won't hurt.
+</p>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-orgb3a0003">
+<h3 id="orgb3a0003">Activity</h3>
+<p>
+Form a circle
+</p>
+
+<aside class="notes">
+<ul>
+<li>Class Activity: Organize into a circle pass the tokens to the right.</li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-orge89a55f">
+<h2 id="orge89a55f"><a id="ID-f1d6bcec-d6e2-4cdf-8b14-3db4c1e68ac9"></a>Published intent</h2>
+
+<div class="figure">
+<p><img src="data/f1/d6bcec-d6e2-4cdf-8b14-3db4c1e68ac9/social-aspects-society_dadc44b78f3f7d11_2018-03-12_14-21-21.jpg" alt="social-aspects-society_dadc44b78f3f7d11_2018-03-12_14-21-21.jpg" />
+</p>
+</div>
+
+<aside class="notes">
+<ul>
+<li>How do these people coordinate?</li>
+<li>Storm Drains</li>
+<li>Autonomy</li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-org205156c">
+<h3 id="org205156c">Activity</h3>
+<p>
+Form a circle
+</p>
+
+<aside class="notes">
+<ul>
+<li>Class Activity: Organize into a circle, take what is offered from the left
+and offer it to the right.</li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-orgaa5ecd2">
+<h2 id="orgaa5ecd2">Promise Theory</h2>
+<ul>
+<li class="fragment appear">Proposed by Mark Burgess in 2004</li>
+<li class="fragment appear">Building reliable systems</li>
+
+</ul>
+
+<aside class="notes">
+<ul>
+<li>Thinking in Promises (2015)</li>
+<li>In Search of Certainty (2013)</li>
+<li>Promise Theory: Principles and Applications (2013)</li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-org8c6e13a">
+<h3 id="org8c6e13a">Promises</h3>
+<ul>
+<li class="fragment appear">Document intent</li>
+<li class="fragment appear"><a href="https://en.wikipedia.org/wiki/Agency_(philosophy)">Agency</a> is required to make a promise</li>
+<li class="fragment appear">Evaluated by user</li>
+<li class="fragment appear">Allow us to model uncertainty</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org4049de7">
+<h3 id="org4049de7">Applications of Promise Theory</h3>
+<ul>
+<li class="fragment appear"><a href="http://masteringbusinessanalysis.com/episode-015-promise-theory-for-team-cooperation-interview-with-mark-burgess/">Team Cooperation</a></li>
+<li class="fragment appear"><a href="https://www.youtube.com/watch?v=6q5nI884r2E">Team Leadership</a></li>
+<li class="fragment appear">Economics
+<ul>
+<li><a href="http://markburgess.org/brexit.html">Brexit</a></li>
+
+</ul></li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org41ce5ef">
+<h3 id="org41ce5ef">Benefits</h3>
+<ul>
+<li class="fragment appear">Identify points of failure</li>
+<li class="fragment appear">Level set expectations</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-orgdf9dee3" data-background="./orange-blue-tilt-right.png">
+<h2 id="orgdf9dee3">CFEngine</h2>
+<p>
+An implementation of promise theory
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-orga200c9a" data-background="./data/fa/983b83-7991-46ff-b3c9-854218f5f829/2825946169_a28b54d71b_o_d_2018-02-17_15-00-16.jpg" data-background-size="90%">
+<h3 id="orga200c9a"><a id="ID-fa983b83-7991-46ff-b3c9-854218f5f829"></a></h3>
+<aside class="notes">
+<p>
+Turning 25 this year.
+Been around since 1993 (as long as linux)
+</p>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-orge151ce5" data-background="./data/8c/aa700f-44e6-4758-ba38-ec4e457c49ee/46f80cc0-790a-11e7-84d9-df29f06febc3_1280x720_161958_2018-02-17_16-26-13.jpg">
+<h3 id="orge151ce5"><a id="ID-8caa700f-44e6-4758-ba38-ec4e457c49ee"></a></h3>
+<div class="column" style="float:left; width: 50%">
+<ul>
+<li class="fragment appear"><font color="white">Autonomous</font></li>
+<li class="fragment appear"><font color="white">Experienced</font></li>
+<li class="fragment appear"><font color="white">Sophisticated</font></li>
+<li class="fragment appear"><font color="white">Flexible</font></li>
+
+</ul>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-orgc4acdd0">
+<h3 id="orgc4acdd0"><a id="ID-1a9484dd-3f71-4a67-8e88-6663aca7d421"></a>CFEngine Components</h3>
+
+<div class="figure">
+<p><img src="data/1a/9484dd-3f71-4a67-8e88-6663aca7d421/components_2018-03-12_15-42-06.png" alt="components_2018-03-12_15-42-06.png" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-orga516314">
+<h3 id="orga516314"><code>cf-agent</code></h3>
+<p>
+<code>cf-agent</code> is the command you will use most often. It is used to run
+policy(code) and ensure your system is in the desired state. If you are running
+any CFEngine command from the command line, there's a greater than 99% chance
+that this is it.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org7062d41">
+<h3 id="org7062d41"><code>cf-monitord</code></h3>
+<p>
+<code>cf-monitord</code> monitors various statistics about the running system. This
+information is made available in the form of <b>classes</b> and <b>variables</b>.
+</p>
+
+<p>
+You'll almost never use <code>cf-monitord</code> directly. However the data provided by
+<code>cf-monitord</code> is available to <code>cf-agent</code>.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org311ece9">
+<h3 id="org311ece9"><code>cf-execd</code></h3>
+<p>
+<code>cf-execd</code> is a periodic task scheduler. You can think of it like <code>cron</code> on
+steroids.
+</p>
+
+<p>
+By default CFEngine runs and enforces policies every <i>five minutes</i>. <code>cf-execd</code>
+is responsible for making that happen.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-orga8d9c7f">
+<h3 id="orga8d9c7f"><code>cf-serverd</code></h3>
+<p>
+<code>cf-serverd</code> runs on the CFEngine server, as well as all clients.
+</p>
+
+<ul>
+<li>On servers it is responsible for serving files to clients.</li>
+<li>On clients it accepts <code>cf-runagent</code> requests</li>
+
+</ul>
+
+<p>
+<code>cf-runagent</code> allows you to request ad-hoc policy runs. I rarely use it.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org677f6fe">
+<h3 id="org677f6fe">Promises</h3>
+<div class="outline-text-3" id="text-org677f6fe">
+</div>
+</section>
+<section id="slide-org4ad4182">
+<h4 id="org4ad4182">Anatomy of a Promise</h4>
+<div class="org-src-container">
+
+<pre><code class="artist" >type:
+  context::
+    "promiser" -> "promisee"
+                    ----------|
+      attribute1 => "value",  |
+      attribute2 => body;     |-- Promise Body
+                    ----------|
+</code></pre>
+</div>
+
+<aside class="notes">
+<p>
+
+</p>
+
+<dl>
+<dt>type</dt><dd>is the kind of promise being made (e.g., files, commands, etc.).</dd>
+<dt>context</dt><dd>Optional and defaults to <code>any::</code>. Promises with a context will only
+apply if the given context is true.</dd>
+<dt>promiser</dt><dd>What is making the promise. (e.g., a file or a process).</dd>
+<dt>promisee</dt><dd>An optional recipient or beneficiary of the promise.</dd>
+<dt>promise body</dt><dd>is a collection of promise attributes (not to be confused with
+a body used as an attribute value)</dd>
+
+</dl>
+
+</aside>
+
+</section>
+<section id="slide-org3260e4a">
+<h4 id="org3260e4a">Promise Attributes</h4>
+<ul>
+<li>Separated by commas</li>
+<li>Vary by <b>promise type</b></li>
+<li>Value is quoted string or unquoted object (function/body/bundle)</li>
+
+</ul>
+
+<aside class="notes">
+<p>
+Each promise can have one or more attributes that describe the parameters of the
+promise. The available attributes will vary depending on the <b>promise type</b>.
+</p>
+
+<p>
+The value can be either a text string (which must be quoted) or another object
+(which must not be quoted). All of the attributes together are called the
+<b>promise body</b> of the promise (as in "the body of an e-mail", or "the body of a
+contract").
+</p>
+
+<p>
+When an attribute value is a body the body specified <b>must have a type matching
+the attribute name</b>.
+</p>
+
+<p>
+Attributes are separated by <b>commas</b>. Each promise ends with a <b>semicolon</b>.
+</p>
+
+</aside>
+
+</section>
+<section id="slide-orga9a52c4">
+<h4 id="orga9a52c4">Example Promise</h4>
+<div class="org-src-container">
+
+<pre><code class="cfengine3" >bundle agent main {
+  files:
+    linux::
+      "/tmp/example" -> { "Instructor", "Students" }
+        create => "true",
+        touch => "true",
+        action => warn_only;
+}
+</code></pre>
+</div>
+
+<pre class="example">
+warning: Need to touch (update time stamps) for '/tmp/multiple-attributes', but only a warning was promised!
+
+</pre>
+
+<aside class="notes">
+<ul>
+<li>This is a promise of <b>type</b> <code>files</code>.</li>
+<li>This promise has a <b>class context</b> of <code>linux</code> (it will only apply if running a
+Linux kernel).</li>
+<li>The <b>promiser</b> is the POSIX path <code>/tmp/example</code>.</li>
+<li>This promise has three <b>attribute</b>, specifying that the file should be
+created if it does not exist, it's timestamp should be updated, and only
+warn about what the agent would do.</li>
+<li>The <b>promisee</b> is both of us</li>
+<li>To create a directory instead, use a <code>files:</code> promise and append a <code>.</code> to the
+directory name (e.g., <code>/tmp/hello/.</code>)</li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-org54a7d53">
+<h3 id="org54a7d53"><a id="ID-52089c14-f3f9-44fa-9c78-665051e5454a"></a>Bundles</h3>
+<ul>
+<li>collection of <b>promises</b></li>
+<li>logical grouping</li>
+<li>can have parameters</li>
+<li><b>ARE NOT FUNCTIONS</b></li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-orgf1f9222">
+<h3 id="orgf1f9222">A bundle for Apache web-server might</h3>
+<ul>
+<li>ensure the <code>apache2</code> package is installed</li>
+<li>ensure the content in the config file is correct</li>
+<li>ensure content is present for serving</li>
+<li>ensure proper permissions of files</li>
+<li>ensure the <code>httpd</code> process is running</li>
+<li>ensure the <code>httpd</code> process is restarted when the configuration changes</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-orgabf853d">
+<h3 id="orgabf853d">Anatomy of a Bundle</h3>
+<div class="org-src-container">
+
+<pre><code class="cfengine3" >bundle type name
+{
+    type:
+      context::
+        "promiser" -> { "promisee" }
+          attribute1 => "value",
+          attribute2 => value;
+
+    type:
+      context::
+        "promiser" -> { "promisee" }
+          attribute1 => "value",
+          attribute2 => value;
+}
+</code></pre>
+</div>
+
+<aside class="notes">
+<p>
+Bundles apply to the binary that executes them. E.g., <code>agent</code> bundles apply to
+<code>cf-agent</code> while <code>server</code> bundles apply to <code>cf-serverd</code>.
+</p>
+
+<p>
+Bundles of type <code>common</code> apply to any CFEngine binary.
+</p>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-orgf04d426">
+<h3 id="orgf04d426"></h3>
+<p>
+Bundles apply to the binary that executes them. E.g., <code>agent</code> bundles apply to
+<code>cf-agent</code> while <code>server</code> bundles apply to <code>cf-serverd</code>.
+</p>
+
+<p>
+Bundles of type <code>common</code> apply to any CFEngine binary.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org6ac4c3a">
+<h3 id="org6ac4c3a">What component(s) use this bundle?</h3>
+<div class="outline-text-3" id="text-org6ac4c3a">
+</div>
+</section>
+<section id="slide-org476890c">
+<h4 id="org476890c">Example 1</h4>
+<div class="org-src-container">
+
+<pre><code class="cfengine3" >bundle common globals
+{
+  vars:
+
+      "tool_path" string => "/srv/tools"
+}
+</code></pre>
+</div>
+
+<aside class="notes">
+<ul>
+<li>cf-agent, cf-monitord, cf-serverd</li>
+
+</ul>
+
+</aside>
+
+</section>
+<section id="slide-orgc5f3f9e">
+<h4 id="orgc5f3f9e">Example 2</h4>
+<div class="org-src-container">
+
+<pre><code class="cfengine3" >bundle server my_access_rules
+{
+  access:
+
+      "$(globals.tool_path)"
+        admit_ips => { "192.168.0.0/24" };
+}
+</code></pre>
+</div>
+
+</section>
+<section id="slide-org1bd91bc">
+<h4 id="org1bd91bc">Example 3</h4>
+<div class="org-src-container">
+
+<pre><code class="cfengine3" >bundle agent my_policy
+{
+
+  vars:
+
+    "config[PermitRootLogin]" string => "no";
+    "config[Port]" string => "22";
+
+  files:
+
+      "/etc/ssh/sshd_config"
+        edit_line => set_line_based( "my_policy.config", " ", "\s+", ".*", "\s*#\s*");
+}
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgb18e26c">
+<h4 id="orgb18e26c">Example 4</h4>
+<div class="org-src-container">
+
+<pre><code class="cfengine3" >bundle monitor measure_cf_serverd
+{
+  vars:
+
+    "pid[cf-serverd]"
+      string => readfile( "$(sys.piddir)/cf-serverd.pid", 4k );
+
+    "reg_stat[rss]" string =>"(?:[^\s+]*\s+){23}([^\s]+)(?:.*)";
+
+  measurements:
+
+   "/proc/$(pid[cf-serverd])/stat"
+     handle => "cf_serverd_vsize",
+     stream_type => "file",
+     data_type => "int",
+     history_type => "weekly",
+     units => "pages in memory",
+     match_value => line_match_value(".*", $(reg_stat[rss]) );
+}
+</code></pre>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org1a71dba">
+<h3 id="org1a71dba">Do we have time, and do you want to try yourself?</h3>
+</section>
+</section>
+<section>
+<section id="slide-org9f07202" data-background="./data/d6/8b554c-574b-4904-84e8-e18588034ad4/2018-02-17_Selection_001_2018-03-12_15-06-01.png">
+<h2 id="org9f07202"><a id="ID-d68b554c-574b-4904-84e8-e18588034ad4"></a><font color="white">How Ants build bridges</font></h2>
+<aside class="notes">
+<ul>
+<li>No one is commanding them to do so</li>
+<li>Follow simple rules/promises</li>
+<li>When ant comes to a gap it slows down and the rest of the colony starts to
+walk over the top a simple rule kicks in</li>
+<li>as long as someone is walking on me stay put</li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-org3ae346e">
+<h2 id="org3ae346e">Questions?</h2>
+</section>
+</section>
+<section>
+<section id="slide-org7592ac7">
+<h2 id="org7592ac7">Connect with Me</h2>
+<ul>
+<li>Email: &lt;<a href="mailto:nick@cmdln.org">nick@cmdln.org</a>&gt; | &lt;<a href="mailto:nick.anderson@northern.tech">nick.anderson@northern.tech</a>&gt;</li>
+<li>Twitter: <a href="https://twitter.com/cmdln_">@cmdln_</a></li>
+<li>Careers at Northern.tech: <a href="https://northern.tech/careers">https://northern.tech/careers</a></li>
+<li>Company Blog: <a href="https://northern.tech/blog">https://northern.tech/blog</a></li>
+<li>My Blog: <a href="http://cmdln.org">http://cmdln.org</a></li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org459b7f6">
+<h2 id="org459b7f6"><a id="ID-fe360aa4-1203-4325-9155-f99be84e4c37"></a>Thanks</h2>
+
+<div class="figure">
+<p><img src="./data/fe/360aa4-1203-4325-9155-f99be84e4c37/giphy_2018-02-17_13-57-35.gif" alt="giphy_2018-02-17_13-57-35.gif" width="75%" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-orgf33351f">
+<h2 id="orgf33351f">Additional Resources</h2>
+<dl>
+<dt><a href="https://www.amazon.com/Thinking-Promises-Designing-Systems-Cooperation/dp/1491917873">Thinking in Promises</a></dt><dd>Easy to read introduction to promise theory.</dd>
+<dt><a href="https://www.amazon.com/Search-Certainty-Science-Information-Infrastructure/dp/1491923075">In Search of Certainty</a></dt><dd>Harder to read introduction to promise theory.</dd>
+<dt><a href="https://www.amazon.com/Promise-Theory-Principles-Applications-1/dp/1495437779">Promise Theory: Principals and Applications</a></dt><dd>Intended for scientists.</dd>
+<dt><a href="http://ncase.me/trust/">The Evolution of Trust</a> (game)</dt><dd>A fun game about trust.</dd>
+<dt><a href="https://vimeo.com/51120837">Relationships</a></dt><dd>One of my favorite talks from Mark Burgess (Vimeo).</dd>
+
+</dl>
+
+</section>
+</section>
+<section>
+<section id="slide-org04d367a">
+<h2 id="org04d367a">Additional Resources Continued</h2>
+<dl>
+<dt><a href="https://www.youtube.com/watch?v=2TPsB5WuZgk">Basic Concepts (part 1)</a></dt><dd>Basic promise theory concepts (YouTube)</dd>
+<dt><a href="https://www.youtube.com/watch?v=P5V_PqWO7_Q">The rules of delegation (part 2)</a></dt><dd>How delegation works (YouTube)</dd>
+<dt><a href="https://www.youtube.com/watch?v=CZcWZokRRac">Scaling Cooperation (part 3)</a></dt><dd>Scaling relationships (YouTube)</dd>
+<dt><a href="http://www.cfenginetutorial.org/">CFEngine Tutorial</a></dt><dd>A comprehensive self directed tutorial to learn CFEngine 3.</dd>
+<dt><a href="https://github.com/nickanderson/CFEngine-zero-to-hero-primer">CFEngine Zero to Hero</a></dt><dd>A quick intro targeting some of the most important
+things to know getting started with CFEngine 3.</dd>
+
+</dl>
+</section>
+</section>
+</div>
+</div>
+<p> Created by Nick Anderson </p>
+<script src="reveal.js-3.6.0/lib/js/head.min.js"></script>
+<script src="reveal.js-3.6.0/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: false,
+center: true,
+slideNumber: 'c/t',
+rollingLinks: true,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'convex', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'reveal.js-3.6.0/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: 'reveal.js-3.6.0/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: 'reveal.js-3.6.0/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+ { src: 'reveal.js-3.6.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+]
+});
+</script>
+</body>
+</html>

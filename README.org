@@ -1,0 +1,613 @@
+#+Title: Intro to Promise Theory and CFEngine
+#+Author: Nick Anderson
+#+Email: nick@cmdln.org
+#+Subtitle: Building Stable Relationships - CS444 Linux Essentials
+#+REVEAL_ROOT: reveal.js-3.6.0
+#+OPTIONS: reveal_title_slide:"<h2>%t</h2><h3>%d</h3><h4>%s</h4>" 
+#+OPTIONS: reveal_center:t reveal_progress:t reveal_history:nil reveal_control:t
+#+OPTIONS: reveal_rolling_links:t reveal_keyboard:t reveal_overview:t num:nil
+#+OPTIONS: toc:nil tags:nil reveal_slide_number:c/t 
+#+REVEAL_TRANS: convex
+#+REVEAL_THEME: white
+#+REVEAL_HLEVEL: 2
+#+REVEAL_HEAD_PREAMBLE: <meta name="description" content="Presentation slides">
+#+REVEAL_POSTAMBLE: <p> Created by %a </p>
+#+REVEAL_PLUGINS: (markdown notes highlight print-pdf)
+#+OPTIONS: reveal_single_file:nil
+#+EXCLUDE_TAGS: noexport
+#+MACRO: color @@html:<font color="$1">$2</font>@@
+
+* Setup                                                            :noexport:
+
+# https://www.reddit.com/r/emacs/comments/79lwwo/am_i_misunderstanding_orgreveal_or_reaching_the/
+
+Export to PDF without jumping through hoops
+
+#+BEGIN_SRC shell :dir /sudo::// :results output
+  apt install phantomjs
+
+#+END_SRC
+
+#+RESULTS:
+: Reading package lists... 0%Reading package lists... 100%Reading package lists... Done
+: Building dependency tree... 0%Building dependency tree... 0%Building dependency tree... 50%Building dependency tree... 50%Building dependency tree       
+: Reading state information... 0%Reading state information... 0%Reading state information... Done
+: phantomjs is already the newest version (2.1.1+dfsg-2).
+: 0 upgraded, 0 newly installed, 0 to remove and 24 not upgraded.
+
+#+BEGIN_SRC emacs-lisp
+  (defun reveal-to-pdf ()
+   "print reveal.js slides to pdf"
+   (interactive)
+   (async-shell-command "phantomjs /home/nickanderson/src/reveal.js/plugin/print-pdf/print-pdf.js 
+                        'file:///home/nickanderson/src/presentations/introduction-to-promise-theory/README.html?print-pdf'")) 
+#+END_SRC
+
+#+RESULTS:
+: reveal-to-pdf
+   
+* {{{color(white,Who am I?)}}}                              :ATTACH:
+:PROPERTIES:
+:ID:       a809bf77-4db5-4889-8680-9917f6ef9978
+:reveal_background: ./data/a8/09bf77-4db5-4889-8680-9917f6ef9978/ddfbddb2f20d9f8d1ffb469db33708f566e6824av2_00_2018-03-13_08-51-15.jpg
+:Attachments: ddfbddb2f20d9f8d1ffb469db33708f566e6824av2_00_2018-03-13_08-51-15.jpg
+:END:
+
+#+DOWNLOADED: https://pm1.narvii.com/6730/ddfbddb2f20d9f8d1ffb469db33708f566e6824av2_00.jpg @ 2018-03-13 08:51:15
+#+ATTR_REVEAL: :frag (appear) 
+- {{{color(white,Nick Anderson)}}}
+- {{{color(white,Husband/Dad)}}}
+- {{{color(white,Sysadmin/Infrastructure Engineer)}}}
+- {{{color(white,CFEngine Doer of Things|Factotum @ Northern.tech)}}}
+
+#+BEGIN_NOTES
+  - Wife, 2 kids and a dog
+  - Infrastructure management for > 15 years
+  - CFEngine since 2010 (8 years), with company since 2013 (5 years)
+    - Focus on Automation, Security, Compliance
+      - Devices, Workstations, Servers, IoT
+#+END_NOTES 
+
+* 
+:PROPERTIES:
+:REVEAL_BACKGROUND: ./2018-01-14_Selection_005.png
+:reveal_background_size: 99%
+:END:
+
+* Relationships
+
+#+BEGIN_QUOTE
+  It's all about who you know.
+  -- They
+#+END_QUOTE
+
+#+BEGIN_NOTES
+  Before we start:
+  - What's the point of all this?
+    - How can we engineer stable, resilient systems
+  - Systems are comprised of discreet parts
+  - We need to understand the relationships that bind the parts together
+#+END_NOTES
+
+#+ATTR_REVEAL: :frag (appear) 
+- How many things can you know?
+
+** {{{color(white,Dunbar)}}}                                        :ATTACH:
+:PROPERTIES:
+:ID:       80023a40-fc3c-4dd3-9702-8f44e27ab4c7
+:Attachments: 1490913157807_2018-02-17_11-50-16.jpg
+:reveal_background: ./data/80/023a40-fc3c-4dd3-9702-8f44e27ab4c7/1490913157807_2018-02-17_11-50-16.jpg
+:reveal_background_size: 99%
+:END:
+#+DOWNLOADED: https://resources.stuff.co.nz/content/dam/images/1/h/e/r/3/s/image.related.StuffLandscapeSixteenByNine.620x349.1i7p6v.png/1490913157807.jpg @ 2018-02-17 11:50:16
+
+#+BEGIN_NOTES
+  Dunbar studied primates.
+
+  Dunbar explained it informally as *"the number of people you would not feel
+  embarrassed about joining uninvited for a drink if you happened to bump into
+  them in a bar"*.
+  
+  Dunbar, Robin (1998). Grooming, gossip, and the evolution of language (1st
+  Harvard University Press paperback ed.). Cambridge, Mass.: Harvard University
+  Press. p. 77. ISBN 0674363361. Retrieved 17 December 2016.
+  
+  On the periphery, the number *also includes past colleagues, such as high
+  school friends, with whom a person would want to reacquaint himself or herself
+  if they met again.*
+  
+  Carl Bialik (16 November 2007). "Sorry, You May Have Gone Over Your Limit Of
+  Network Friends". The Wall Street Journal Online. Retrieved 2007-12-02.
+  
+  - http://www.lifewithalacrity.com/2004/03/the_dunbar_numb.html
+  - http://www.ontheagilepath.net/2015/12/magical-team-size-numbers-2-3-5-7-12-50-150-1500-and-how-to-avoid-wasting-everybodys-time.html
+#+END_NOTES
+
+** {{{color(white,Dunbar)}}}                                        :ATTACH:
+:PROPERTIES:
+:reveal_background: ./data/07/18a6ce-f8dc-42c2-90d5-a7a7a94e48bf/1490913157807_2018-02-17_11-50-16-blurred_2018-03-13_08-47-48.jpg
+:ID:       0718a6ce-f8dc-42c2-90d5-a7a7a94e48bf
+:Attachments: 1490913157807_2018-02-17_11-50-16-blurred_2018-03-13_08-47-48.jpg
+:END:
+
+#+ATTR_REVEAL: :frag (appear) 
+- {{{color(white,Maximum number of stable relationships one can manage)}}}
+- {{{color(white,~ 150)}}}
+#+ATTR_REVEAL: :frag (appear) 
+  + {{{color(white,2–3 intimate relationships)}}}
+  + {{{color(white,5-7 circle of our very closest friends)}}}
+  + {{{color(white,12–50 tribe)}}}
+  + {{{color(white,150–1500 battalion)}}}
+
+#+BEGIN_NOTES
+  Dunbar studied primates.
+
+  Dunbar explained it informally as *"the number of people you would not feel
+  embarrassed about joining uninvited for a drink if you happened to bump into
+  them in a bar"*.
+  
+  Dunbar, Robin (1998). Grooming, gossip, and the evolution of language (1st
+  Harvard University Press paperback ed.). Cambridge, Mass.: Harvard University
+  Press. p. 77. ISBN 0674363361. Retrieved 17 December 2016.
+  
+  On the periphery, the number *also includes past colleagues, such as high
+  school friends, with whom a person would want to reacquaint himself or herself
+  if they met again.*
+  
+  Carl Bialik (16 November 2007). "Sorry, You May Have Gone Over Your Limit Of
+  Network Friends". The Wall Street Journal Online. Retrieved 2007-12-02.
+  
+  - http://www.lifewithalacrity.com/2004/03/the_dunbar_numb.html
+  - http://www.ontheagilepath.net/2015/12/magical-team-size-numbers-2-3-5-7-12-50-150-1500-and-how-to-avoid-wasting-everybodys-time.html
+#+END_NOTES
+
+** Trust :ATTACH:
+:PROPERTIES:
+:ID:       1b6a7a59-e573-4df0-bf94-9fe4fc8248bc
+:Attachments: 2018-03-13_Selection_001_2018-03-13_09-56-22.png
+:END:
+
+#+ATTR_REVEAL: :frag (appear) 
+- The foundation of relationships
+- Necessary for large systems like societies to function
+- Built on repeated interactions over time
+#+DOWNLOADED: /home/nickanderson/Pictures/Screenshots/2018-03-13_Selection_001.png @ 2018-03-13 09:56:22
+#+ATTR_REVEAL: :frag (appear) 
+[[file:data/1b/6a7a59-e573-4df0-bf94-9fe4fc8248bc/2018-03-13_Selection_001_2018-03-13_09-56-22.png]]
+
+#+BEGIN_NOTES
+  - Economical
+  - Allows us to do less work
+#+END_NOTES
+**  
+:PROPERTIES:
+:reveal_background: ./data/f8/dc7d74-c4ba-4d67-b803-9e75dcdf2986/Smart-City-von-oben-klein_2018-03-13_08-04-36.jpeg
+:Attachments: Smart-City-von-oben-klein_2018-03-13_08-04-36.jpeg
+:END:
+
+** {{{color(white,Scaling)}}}                                       :ATTACH:
+:PROPERTIES:
+:ID:       f8dc7d74-c4ba-4d67-b803-9e75dcdf2986
+:reveal_background: ./data/f8/dc7d74-c4ba-4d67-b803-9e75dcdf2986/Smart-City-von-oben-klein_2018-03-13_08-04-36-blurred.jpeg
+:Attachments: Smart-City-von-oben-klein_2018-03-13_08-04-36.jpeg Smart-City-von-oben-klein_2018-03-13_08-04-36-blurred_2018-03-13_09-38-18.jpeg
+:END:
+
+#+DOWNLOADED: https://www.toposmagazine.com/wp-content/uploads/sites/7/2017/03/Smart-City-von-oben-klein.jpeg @ 2018-03-13 08:04:36
+#+ATTR_REVEAL: :frag (appear) 
+- {{{color(white,Can technology scale your relationships?)}}} {{{color(white,https://www.youtube.com/watch?v=07IpED729k8)}}}
+#+ATTR_REVEAL: :frag (appear) 
+  - {{{color(white,TLDW; Kind of but no not really)}}}
+
+#+BEGIN_NOTES
+  - Common for groups to break up along Dunbar limits
+    - Nuclear Family Sizes
+    - Classrooms
+#+END_NOTES
+
+* Imposition                                                         :ATTACH:
+:PROPERTIES:
+:ID:       65cf670e-a934-464d-a058-ee9d65f8ad69
+:Attachments: goosestep_2018-02-17_13-27-35.jpg mediapuppets_2018-02-17_13-32-26.jpeg media-manipulation1_2018-03-12_14-06-31.jpg Chain-Gang-2_2018-03-13_07-56-05.jpg
+:END:
+
+#+DOWNLOADED: https://returntonow.net/wp-content/uploads/2016/06/Chain-Gang-2.jpg @ 2018-03-13 07:56:06
+[[file:data/65/cf670e-a934-464d-a058-ee9d65f8ad69/Chain-Gang-2_2018-03-13_07-56-05.jpg]]
+
+#+BEGIN_NOTES
+  - Golden Images
+  - The controller must act for everyone
+  - SSH/Commands
+  - What if multiple bosses give conflicting orders
+  - Difficult to identify proper authority
+
+  Impose on someone: Throw something that won't hurt.
+#+END_NOTES
+
+** Activity
+
+Form a circle
+
+#+BEGIN_NOTES
+  - Class Activity: Organize into a circle pass the tokens to the right.
+#+END_NOTES
+
+* Published intent :ATTACH:
+:PROPERTIES:
+:ID:       f1d6bcec-d6e2-4cdf-8b14-3db4c1e68ac9
+:Attachments: social-aspects-society_dadc44b78f3f7d11_2018-03-12_14-21-21.jpg
+:END:
+
+#+DOWNLOADED: http://ourlife.org.uk/wp-content/uploads/2016/10/social-aspects-society_dadc44b78f3f7d11.jpg @ 2018-03-12 14:21:22
+[[file:data/f1/d6bcec-d6e2-4cdf-8b14-3db4c1e68ac9/social-aspects-society_dadc44b78f3f7d11_2018-03-12_14-21-21.jpg]]
+
+#+BEGIN_NOTES
+  - How do these people coordinate?
+  - Storm Drains
+  - Autonomy
+#+END_NOTES
+
+** Activity
+Form a circle
+
+#+BEGIN_NOTES
+  - Class Activity: Organize into a circle, take what is offered from the left
+    and offer it to the right.
+#+END_NOTES
+
+* Promise Theory
+
+#+ATTR_REVEAL: :frag (appear) 
+- Proposed by Mark Burgess in 2004
+- Building reliable systems
+
+#+BEGIN_NOTES
+  - Thinking in Promises (2015)
+  - In Search of Certainty (2013)
+  - Promise Theory: Principles and Applications (2013)
+#+END_NOTES
+
+** Promises
+
+#+ATTR_REVEAL: :frag (appear) 
+- Document intent
+- [[https://en.wikipedia.org/wiki/Agency_(philosophy)][Agency]] is required to make a promise
+- Evaluated by user
+- Allow us to model uncertainty
+
+** Applications of Promise Theory
+#+ATTR_REVEAL: :frag (appear) 
+- [[http://masteringbusinessanalysis.com/episode-015-promise-theory-for-team-cooperation-interview-with-mark-burgess/][Team Cooperation]]
+- [[https://www.youtube.com/watch?v=6q5nI884r2E][Team Leadership]] 
+- Economics
+  - [[http://markburgess.org/brexit.html][Brexit]]
+
+** Benefits
+#+ATTR_REVEAL: :frag (appear) 
+- Identify points of failure
+- Level set expectations
+
+* CFEngine
+:PROPERTIES:
+:reveal_background: ./orange-blue-tilt-right.png
+:END:
+
+An implementation of promise theory
+
+**  
+:PROPERTIES:
+:ID:       fa983b83-7991-46ff-b3c9-854218f5f829
+:Attachments: 2825946169_a28b54d71b_o_d_2018-02-17_15-00-16.jpg
+:reveal_background: ./data/fa/983b83-7991-46ff-b3c9-854218f5f829/2825946169_a28b54d71b_o_d_2018-02-17_15-00-16.jpg
+:reveal_background_size: 90%
+:END:
+
+# +DOWNLOADED: https://farm4.staticflickr.com/3138/2825946169_a28b54d71b_o_d.jpg @ 2018-02-17 15:00:17
+#+BEGIN_NOTES
+  Turning 25 this year.
+  Been around since 1993 (as long as linux)
+#+END_NOTES
+
+**  
+:PROPERTIES:
+:ID:       8caa700f-44e6-4758-ba38-ec4e457c49ee
+:Attachments: 46f80cc0-790a-11e7-84d9-df29f06febc3_1280x720_161958_2018-02-17_16-26-13.jpg
+:reveal_background: ./data/8c/aa700f-44e6-4758-ba38-ec4e457c49ee/46f80cc0-790a-11e7-84d9-df29f06febc3_1280x720_161958_2018-02-17_16-26-13.jpg
+:END:
+# +DOWNLOADED: https://cdn3.i-scmp.com/sites/default/files/styles/landscape/public/images/methode/2017/08/16/46f80cc0-790a-11e7-84d9-df29f06febc3_1280x720_161958.jpg @ 2018-02-17 16:26:14
+
+# https://stackoverflow.com/questions/33148572/columns-in-reveal-js-with-org-mode
+#+REVEAL_HTML: <div class="column" style="float:left; width: 50%">
+#+ATTR_REVEAL: :frag (appear) 
+- {{{color(white,Autonomous)}}}
+- {{{color(white,Experienced)}}}
+- {{{color(white,Sophisticated)}}}
+- {{{color(white,Flexible)}}}
+#+REVEAL_HTML: </div>
+
+** CFEngine Components :ATTACH:
+:PROPERTIES:
+:ID:       1a9484dd-3f71-4a67-8e88-6663aca7d421
+:Attachments: components_2018-03-12_15-42-06.png
+:END:
+
+#+DOWNLOADED: https://www.primefaces.org/wp-content/uploads/2015/12/components.png @ 2018-03-12 15:42:08
+[[file:data/1a/9484dd-3f71-4a67-8e88-6663aca7d421/components_2018-03-12_15-42-06.png]]
+
+** =cf-agent=
+
+=cf-agent= is the command you will use most often. It is used to run
+policy(code) and ensure your system is in the desired state. If you are running
+any CFEngine command from the command line, there's a greater than 99% chance
+that this is it.
+
+** =cf-monitord=
+
+=cf-monitord= monitors various statistics about the running system. This
+information is made available in the form of *classes* and *variables*.
+
+You'll almost never use =cf-monitord= directly. However the data provided by
+=cf-monitord= is available to =cf-agent=.
+
+** =cf-execd=
+
+=cf-execd= is a periodic task scheduler. You can think of it like =cron= on
+steroids.
+
+By default CFEngine runs and enforces policies every /five minutes/. =cf-execd=
+is responsible for making that happen.
+
+** =cf-serverd=
+
+=cf-serverd= runs on the CFEngine server, as well as all clients.
+
+- On servers it is responsible for serving files to clients.
+- On clients it accepts =cf-runagent= requests
+
+=cf-runagent= allows you to request ad-hoc policy runs. I rarely use it.
+
+** Promises
+*** Anatomy of a Promise
+
+#+BEGIN_SRC artist
+  type:
+    context::
+      "promiser" -> "promisee"
+                      ----------|
+        attribute1 => "value",  |
+        attribute2 => body;     |-- Promise Body
+                      ----------|
+#+END_SRC
+
+#+BEGIN_NOTES
+
+- type :: is the kind of promise being made (e.g., files, commands, etc.).
+- context :: Optional and defaults to =any::=. Promises with a context will only
+             apply if the given context is true.
+- promiser :: What is making the promise. (e.g., a file or a process).
+- promisee :: An optional recipient or beneficiary of the promise.
+- promise body :: is a collection of promise attributes (not to be confused with
+                  a body used as an attribute value)
+#+END_NOTES
+
+*** Promise Attributes
+
+- Separated by commas
+- Vary by *promise type*
+- Value is quoted string or unquoted object (function/body/bundle)
+
+#+BEGIN_NOTES
+  Each promise can have one or more attributes that describe the parameters of the
+  promise. The available attributes will vary depending on the *promise type*.
+
+  The value can be either a text string (which must be quoted) or another object
+  (which must not be quoted). All of the attributes together are called the
+  *promise body* of the promise (as in "the body of an e-mail", or "the body of a
+  contract").
+
+  When an attribute value is a body the body specified *must have a type matching
+  the attribute name*.
+
+  Attributes are separated by *commas*. Each promise ends with a *semicolon*.
+#+END_NOTES
+
+*** Example Promise
+
+#+BEGIN_SRC cfengine3 :exports both
+  bundle agent main {
+    files:
+      linux::
+        "/tmp/example" -> { "Instructor", "Students" }
+          create => "true",
+          touch => "true",
+          action => warn_only;
+  }
+#+END_SRC
+
+#+RESULTS:
+:  warning: Need to touch (update time stamps) for '/tmp/multiple-attributes', but only a warning was promised!
+
+#+BEGIN_NOTES
+  - This is a promise of *type* =files=.
+  - This promise has a *class context* of =linux= (it will only apply if running a
+    Linux kernel).
+  - The *promiser* is the POSIX path =/tmp/example=.
+  - This promise has three *attribute*, specifying that the file should be
+    created if it does not exist, it's timestamp should be updated, and only
+    warn about what the agent would do.
+  - The *promisee* is both of us
+  - To create a directory instead, use a =files:= promise and append a =.= to the
+    directory name (e.g., =/tmp/hello/.=)
+#+END_NOTES
+
+** Bundles
+:PROPERTIES:
+:ID:       52089c14-f3f9-44fa-9c78-665051e5454a
+:END:
+
+- collection of *promises*
+- logical grouping
+- can have parameters
+- *ARE NOT FUNCTIONS*
+
+** A bundle for Apache web-server might 
+
+- ensure the =apache2= package is installed
+- ensure the content in the config file is correct
+- ensure content is present for serving
+- ensure proper permissions of files
+- ensure the =httpd= process is running
+- ensure the =httpd= process is restarted when the configuration changes
+
+** Anatomy of a Bundle
+
+#+BEGIN_SRC cfengine3
+  bundle type name
+  {
+      type:
+        context::
+          "promiser" -> { "promisee" }
+            attribute1 => "value",
+            attribute2 => value;
+
+      type:
+        context::
+          "promiser" -> { "promisee" }
+            attribute1 => "value",
+            attribute2 => value;
+  }
+#+END_SRC
+
+#+BEGIN_NOTES
+Bundles apply to the binary that executes them. E.g., =agent= bundles apply to
+=cf-agent= while =server= bundles apply to =cf-serverd=.
+
+Bundles of type =common= apply to any CFEngine binary.
+#+END_NOTES
+** 
+
+Bundles apply to the binary that executes them. E.g., =agent= bundles apply to
+=cf-agent= while =server= bundles apply to =cf-serverd=.
+
+Bundles of type =common= apply to any CFEngine binary.
+
+** What component(s) use this bundle?
+*** Example 1
+
+#+BEGIN_SRC cfengine3
+  bundle common globals
+  {
+    vars:
+
+        "tool_path" string => "/srv/tools"
+  }
+#+END_SRC
+
+#+BEGIN_NOTES
+  - cf-agent, cf-monitord, cf-serverd
+#+END_NOTES
+
+*** Example 2
+
+#+BEGIN_SRC cfengine3
+  bundle server my_access_rules
+  {
+    access:
+
+        "$(globals.tool_path)"
+          admit_ips => { "192.168.0.0/24" };
+  }
+#+END_SRC
+
+*** Example 3
+
+#+BEGIN_SRC cfengine3
+  bundle agent my_policy
+  {
+      
+    vars:
+
+      "config[PermitRootLogin]" string => "no";
+      "config[Port]" string => "22";
+
+    files:
+
+        "/etc/ssh/sshd_config"
+          edit_line => set_line_based( "my_policy.config", " ", "\s+", ".*", "\s*#\s*");
+  }
+#+END_SRC
+
+*** Example 4
+
+#+BEGIN_SRC cfengine3
+  bundle monitor measure_cf_serverd
+  {
+    vars:
+
+      "pid[cf-serverd]"
+        string => readfile( "$(sys.piddir)/cf-serverd.pid", 4k );
+
+      "reg_stat[rss]" string =>"(?:[^\s+]*\s+){23}([^\s]+)(?:.*)";
+
+    measurements:
+
+     "/proc/$(pid[cf-serverd])/stat"
+       handle => "cf_serverd_vsize",
+       stream_type => "file",
+       data_type => "int",
+       history_type => "weekly",
+       units => "pages in memory",
+       match_value => line_match_value(".*", $(reg_stat[rss]) );
+  }
+#+END_SRC
+
+** Do we have time, and do you want to try yourself?
+* {{{color(white,How Ants build bridges)}}}                          :ATTACH:
+:PROPERTIES:
+:ID:       d68b554c-574b-4904-84e8-e18588034ad4
+:Attachments: 2018-02-17_Selection_001_2018-03-12_15-06-01.png
+:reveal_background: ./data/d6/8b554c-574b-4904-84e8-e18588034ad4/2018-02-17_Selection_001_2018-03-12_15-06-01.png
+:END:
+
+#+BEGIN_NOTES
+  - No one is commanding them to do so
+  - Follow simple rules/promises
+  - When ant comes to a gap it slows down and the rest of the colony starts to
+    walk over the top a simple rule kicks in
+  - as long as someone is walking on me stay put
+#+END_NOTES
+
+* Questions?
+* Connect with Me
+
+- Email: <[[mailto:nick@cmdln.org][nick@cmdln.org]]> | <[[mailto:nick.anderson@northern.tech][nick.anderson@northern.tech]]>
+- Twitter: [[https://twitter.com/cmdln_][@cmdln_]]
+- Careers at Northern.tech: https://northern.tech/careers
+- Company Blog: https://northern.tech/blog
+- My Blog: http://cmdln.org
+
+* Thanks :ATTACH:
+:PROPERTIES:
+:ID:       fe360aa4-1203-4325-9155-f99be84e4c37
+:Attachments: giphy_2018-02-17_13-57-35.gif
+:END:
+
+#+DOWNLOADED: https://media.giphy.com/media/igB2Th9e4nW6s/giphy.gif @ 2018-02-17 13:57:35
+#+ATTR_HTML: :width 75%
+file:./data/fe/360aa4-1203-4325-9155-f99be84e4c37/giphy_2018-02-17_13-57-35.gif
+
+* Additional Resources
+
+- [[https://www.amazon.com/Thinking-Promises-Designing-Systems-Cooperation/dp/1491917873][Thinking in Promises]] :: Easy to read introduction to promise theory.
+- [[https://www.amazon.com/Search-Certainty-Science-Information-Infrastructure/dp/1491923075][In Search of Certainty]] :: Harder to read introduction to promise theory.
+- [[https://www.amazon.com/Promise-Theory-Principles-Applications-1/dp/1495437779][Promise Theory: Principals and Applications]] :: Intended for scientists.
+- [[http://ncase.me/trust/][The Evolution of Trust]] (game) :: A fun game about trust.
+- [[https://vimeo.com/51120837][Relationships]] :: One of my favorite talks from Mark Burgess (Vimeo).
+
+* Additional Resources Continued
+
+- [[https://www.youtube.com/watch?v=2TPsB5WuZgk][Basic Concepts (part 1)]] :: Basic promise theory concepts (YouTube) 
+- [[https://www.youtube.com/watch?v=P5V_PqWO7_Q][The rules of delegation (part 2)]] :: How delegation works (YouTube)
+- [[https://www.youtube.com/watch?v=CZcWZokRRac][Scaling Cooperation (part 3)]] :: Scaling relationships (YouTube)
+- [[http://www.cfenginetutorial.org/][CFEngine Tutorial]] :: A comprehensive self directed tutorial to learn CFEngine 3.
+- [[https://github.com/nickanderson/CFEngine-zero-to-hero-primer][CFEngine Zero to Hero]] :: A quick intro targeting some of the most important
+     things to know getting started with CFEngine 3.

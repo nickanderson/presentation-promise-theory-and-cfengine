@@ -1,0 +1,9 @@
+.background-image {
+  -webkit-filter: blur(55px);
+  -moz-filter: blur(55px);
+  -o-filter: blur(55px);
+  -ms-filter: blur(55px);
+  filter: blur(55px);
+  opacity: 0.1;
+  backdrop-filter: blur(55px);
+}
